@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VSPO成員觀看頻率排序byれなち</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Area that will be captured for screenshots - title and tiers only -->
+        <div id="captureArea">
+            <header class="app-header screenshot-header">
+                <h1 class="app-title">
+                    <span class="editable-date" contenteditable="true" id="dateInput">[2025/05/30]</span>SPO成員觀看頻率排序byれなち
+                </h1>
+            </header>
+
+            <div class="tiers-container">
+                <div class="tier tier-1" data-tier="1">
+                    <div class="tier-header">
+                        <h3>幾乎全看</h3>
+                        <span class="member-count">(0)</span>
+                    </div>
+                    <div class="tier-content" id="tier-1"></div>
+                </div>
+
+                <div class="tier tier-2" data-tier="2">
+                    <div class="tier-header">
+                        <h3>很常看</h3>
+                        <span class="member-count">(0)</span>
+                    </div>
+                    <div class="tier-content" id="tier-2"></div>
+                </div>
+
+                <div class="tier tier-3" data-tier="3">
+                    <div class="tier-header">
+                        <h3>常看</h3>
+                        <span class="member-count">(0)</span>
+                    </div>
+                    <div class="tier-content" id="tier-3"></div>
+                </div>
+
+                <div class="tier tier-4" data-tier="4">
+                    <div class="tier-header">
+                        <h3>偶爾看</h3>
+                        <span class="member-count">(0)</span>
+                    </div>
+                    <div class="tier-content" id="tier-4"></div>
+                </div>
+
+                <div class="tier tier-5" data-tier="5">
+                    <div class="tier-header">
+                        <h3>很少看</h3>
+                        <span class="member-count">(0)</span>
+                    </div>
+                    <div class="tier-content" id="tier-5"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls section - outside the capture area -->
+        <div class="controls-section">
+            <div class="controls">
+                <button class="btn btn--secondary" id="resetBtn">重置</button>
+                <button class="btn btn--secondary" id="randomBtn">隨機分配</button>
+                <button class="btn btn--primary" id="exportBtn">匯出排名截圖</button>
+            </div>
+        </div>
+
+        <div class="member-pool-section">
+            <div class="member-pool-header">
+                <h3>未分類成員</h3>
+                <span class="member-count" id="poolCount">(23)</span>
+            </div>
+            <div class="member-pool" id="memberPool"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
