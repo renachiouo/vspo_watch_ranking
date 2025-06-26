@@ -96,7 +96,7 @@ function createMemberCard(memberIndex) {
             <div class="member-name-en">${member.name_en}</div>
         </div>
         <div class="member-checkbox-container">
-            <input type="checkbox" class="member-checkbox" id="member-${memberIndex}" ${member.isMember ? 'checked' : ''}>
+            <img src="${member.avatar}" class="member-checkbox" id="member-${memberIndex}" ${member.isMember ? 'checked' : ''}>
         </div>
     `;
     
@@ -104,7 +104,7 @@ function createMemberCard(memberIndex) {
     card.addEventListener('dragend', handleDragEnd);
     card.addEventListener('touchstart', handleTouchStart, {passive: true});
     
-    card.querySelector('.member-checkbox').addEventListener('change', (e) => {
+    card.querySelector('.member-star').addEventListener('click', (e) => {
         e.stopPropagation();
         toggleMemberStatus(memberIndex);
     });
