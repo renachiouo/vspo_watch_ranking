@@ -446,6 +446,7 @@
         }
         
         function saveState() {
+            const newOrder = {};
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 const tier = zone.id === 'memberPool' ? 'pool' : zone.id.split('-')[1];
                 zone.querySelectorAll('.member-card').forEach(card => {
@@ -501,6 +502,7 @@
 
         function renderAll() {
             const order = {};
+             // 讀取目前的順序
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 order[zone.id] = [...zone.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex);
             });
@@ -514,7 +516,8 @@
                  const container = document.getElementById(containerId);
                  if(container) container.appendChild(card);
             });
-
+            
+            // 恢復排序
             Object.keys(order).forEach(containerId => {
                 const container = document.getElementById(containerId);
                 if (container) {
@@ -596,9 +599,9 @@
                 draggedElement.classList.add('dragging');
 
                 document.addEventListener('touchmove', handleTouchMove, {passive: false});
-                document.addEventListener('touchend', handleTouchEnd, {passive: false});
             }, 150);
 
+            document.addEventListener('touchend', handleTouchEnd, {once: true});
         }
         
         function handleTouchMove(e) {
@@ -607,8 +610,10 @@
 
             const touch = e.touches[0];
             
-            ghostElement.style.left = `${touch.clientX - offsetX}px`;
-            ghostElement.style.top = `${touch.clientY - offsetY}px`;
+            requestAnimationFrame(() => {
+                ghostElement.style.left = `${touch.clientX - offsetX}px`;
+                ghostElement.style.top = `${touch.clientY - offsetY}px`;
+            });
 
             const dropZone = findDropZone(touch.clientX, touch.clientY);
             document.querySelectorAll('.drop-zone.drag-over').forEach(zone => zone.classList.remove('drag-over'));
@@ -617,14 +622,12 @@
 
         function handleTouchEnd(e) {
             clearTimeout(touchTimer); 
+            document.removeEventListener('touchmove', handleTouchMove);
 
             if (!ghostElement) {
                 draggedElement = null;
                 return;
             }
-
-            document.removeEventListener('touchmove', handleTouchMove);
-            document.removeEventListener('touchend', handleTouchEnd);
 
             const touch = e.changedTouches[0];
             const dropZone = findDropZone(touch.clientX, touch.clientY);
