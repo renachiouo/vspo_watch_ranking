@@ -105,6 +105,7 @@
             align-items: center;
             margin-bottom: var(--space-32);
             text-align: center;
+            flex-wrap: wrap;
         }
 
         .app-title {
@@ -112,6 +113,24 @@
             font-weight: var(--font-weight-bold);
         }
         
+        .editable-date {
+            color: var(--color-primary);
+            border-bottom: 2px dashed var(--color-border);
+            padding: var(--space-2) var(--space-4);
+            margin-right: var(--space-8);
+            border-radius: var(--radius-sm);
+            transition: all var(--duration-fast) var(--ease-standard);
+            cursor: text;
+        }
+        .editable-date:hover {
+            background-color: var(--color-secondary);
+        }
+        .editable-date:focus {
+            outline: none;
+            background-color: var(--color-secondary-hover);
+            border-bottom-style: solid;
+        }
+
         /* 控制按鈕 */
         .controls-section {
             display: flex;
@@ -198,6 +217,7 @@
              border: 2px dashed rgba(255, 255, 255, 0.5);
         }
         .drop-zone.drag-over {
+            border-style: solid;
             border-color: var(--color-primary);
         }
 
@@ -243,8 +263,14 @@
         .member-card.dragging {
             cursor: grabbing;
             opacity: 0.4;
-            box-shadow: var(--shadow-lg);
+        }
+        .member-card.ghost {
+            position: fixed; /* 使用 fixed 定位，脫離文檔流 */
+            pointer-events: none;
             z-index: 1000;
+            box-shadow: var(--shadow-lg);
+            transform-origin: center center;
+            transition: none; /* 幻影移動時不需要動畫 */
         }
         .member-card.is-member::before {
             content: "";
@@ -328,7 +354,9 @@
         <!-- 將被截圖的區域 -->
         <div id="captureArea">
             <header class="app-header">
-                <h1 class="app-title">VSPO成員觀看頻率排序</h1>
+                <h1 class="app-title">
+                    <span class="editable-date" contenteditable="true" id="dateInput"></span>VSPO成員觀看頻率排序 by れなち
+                </h1>
             </header>
 
             <div class="tiers-container">
@@ -358,7 +386,7 @@
     </div>
 
     <script>
-        // VSPO 成員資料 (顏色已修正)
+        // VSPO 成員資料
         const members = [
             {"name_jp": "花芽すみれ", "name_en": "Kaga Sumire", "color": "#b0c4de", "avatar": "https://pbs.twimg.com/profile_images/1912465565295263744/ZXjbYmGJ_400x400.jpg"},
             {"name_jp": "花芽なずな", "name_en": "Kaga Nazuna", "color": "#fabedc", "avatar": "https://pbs.twimg.com/profile_images/1907435057507430400/KvnnxOFy_400x400.jpg"},
@@ -388,9 +416,8 @@
         // 應用程式狀態
         let memberState = {};
         let draggedElement = null;
-        // 觸控拖曳狀態變數
-        let touchStartX, touchStartY, isDragging = false;
-
+        let ghostElement = null;
+        let touchTimer, offsetX, offsetY;
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeMemberState();
@@ -403,18 +430,17 @@
             if (savedState) {
                 memberState = JSON.parse(savedState);
                 members.forEach((member, index) => {
-                    if (memberState[index]) {
-                        memberState[index].name_jp = member.name_jp;
-                        memberState[index].name_en = member.name_en;
-                        memberState[index].color = member.color;
-                        memberState[index].avatar = member.avatar;
+                    const id = index;
+                    if (memberState[id]) {
+                        Object.assign(memberState[id], member);
                     } else {
-                        memberState[index] = { id: index, tier: 'pool', isMember: false, ...member };
+                        memberState[id] = { id, tier: 'pool', isMember: false, ...member };
                     }
                 });
             } else {
                  members.forEach((member, index) => {
-                    memberState[index] = { id: index, tier: 'pool', isMember: false, ...member };
+                    const id = index;
+                    memberState[id] = { id, tier: 'pool', isMember: false, ...member };
                 });
             }
         }
@@ -423,9 +449,9 @@
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 const tier = zone.id === 'memberPool' ? 'pool' : zone.id.split('-')[1];
                 zone.querySelectorAll('.member-card').forEach(card => {
-                    const memberIndex = card.dataset.memberIndex;
-                    if(memberState[memberIndex]) {
-                       memberState[memberIndex].tier = tier;
+                    const memberId = card.dataset.memberIndex;
+                    if(memberState[memberId]) {
+                       memberState[memberId].tier = tier;
                     }
                 });
             });
@@ -474,15 +500,29 @@
         }
 
         function renderAll() {
+            const order = {};
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                order[zone.id] = [...zone.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex);
+            });
+
             document.querySelectorAll('.drop-zone').forEach(zone => zone.innerHTML = '');
             
-            Object.values(memberState).sort((a,b) => a.id - b.id).forEach(member => {
+            Object.values(memberState).forEach(member => {
                  if (!member) return;
                  const card = createMemberCard(member.id);
-                 const tier = member.tier;
-                 const containerId = tier === 'pool' ? 'memberPool' : `tier-${tier}`;
+                 const containerId = member.tier === 'pool' ? 'memberPool' : `tier-${member.tier}`;
                  const container = document.getElementById(containerId);
                  if(container) container.appendChild(card);
+            });
+
+            Object.keys(order).forEach(containerId => {
+                const container = document.getElementById(containerId);
+                if (container) {
+                     order[containerId].forEach(memberId => {
+                         const card = document.querySelector(`.member-card[data-member-index="${memberId}"]`);
+                         if(card) container.appendChild(card);
+                     });
+                }
             });
 
             updateAllCounts();
@@ -506,7 +546,6 @@
             saveState();
         }
 
-        // --- 滑鼠拖曳事件 ---
         function handleDragStart(e) {
             draggedElement = this;
             setTimeout(() => this.classList.add('dragging'), 0);
@@ -532,50 +571,64 @@
             }
         }
         
-        // --- 觸控拖曳事件 (已修正) ---
         function handleTouchStart(e) {
             if (e.target.classList.contains('member-star')) return;
-            e.preventDefault();
-
             draggedElement = this;
-            isDragging = false;
-            
-            const touch = e.touches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
-            
-            document.addEventListener('touchmove', handleTouchMove, {passive: false});
-            document.addEventListener('touchend', handleTouchEnd, {passive: false});
+
+            touchTimer = setTimeout(() => {
+                e.preventDefault();
+                
+                const touch = e.touches[0];
+                const rect = draggedElement.getBoundingClientRect();
+                
+                offsetX = touch.clientX - rect.left;
+                offsetY = touch.clientY - rect.top;
+
+                ghostElement = draggedElement.cloneNode(true);
+                ghostElement.classList.add('ghost');
+                document.body.appendChild(ghostElement);
+                ghostElement.style.width = `${rect.width}px`;
+                ghostElement.style.height = `${rect.height}px`;
+
+                ghostElement.style.left = `${touch.clientX - offsetX}px`;
+                ghostElement.style.top = `${touch.clientY - offsetY}px`;
+                
+                draggedElement.classList.add('dragging');
+
+                document.addEventListener('touchmove', handleTouchMove, {passive: false});
+                document.addEventListener('touchend', handleTouchEnd, {passive: false});
+            }, 150);
+
         }
         
         function handleTouchMove(e) {
-            if (!draggedElement) return;
+            if (!ghostElement) return;
             e.preventDefault();
 
-            if (!isDragging) {
-                draggedElement.classList.add('dragging');
-                isDragging = true;
-            }
-
             const touch = e.touches[0];
-            // 視覺化拖曳 (使用 transform)
-            const deltaX = touch.clientX - touchStartX;
-            const deltaY = touch.clientY - touchStartY;
-            draggedElement.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
             
-            // 找出手指下的放置區並加上高亮樣式
+            ghostElement.style.left = `${touch.clientX - offsetX}px`;
+            ghostElement.style.top = `${touch.clientY - offsetY}px`;
+
             const dropZone = findDropZone(touch.clientX, touch.clientY);
             document.querySelectorAll('.drop-zone.drag-over').forEach(zone => zone.classList.remove('drag-over'));
             if(dropZone) dropZone.classList.add('drag-over');
         }
 
         function handleTouchEnd(e) {
-            if (!draggedElement) return;
+            clearTimeout(touchTimer); 
+
+            if (!ghostElement) {
+                draggedElement = null;
+                return;
+            }
+
+            document.removeEventListener('touchmove', handleTouchMove);
+            document.removeEventListener('touchend', handleTouchEnd);
 
             const touch = e.changedTouches[0];
             const dropZone = findDropZone(touch.clientX, touch.clientY);
             
-            // 如果找到有效的放置區，才進行DOM操作
             if (dropZone) {
                 const afterElement = getDragAfterElement(dropZone, touch.clientX);
                 if (afterElement == null) {
@@ -585,28 +638,23 @@
                 }
             }
             
-            // 清理樣式和狀態
+            document.body.removeChild(ghostElement);
             draggedElement.classList.remove('dragging');
-            draggedElement.style.transform = '';
             document.querySelectorAll('.drop-zone.drag-over').forEach(zone => zone.classList.remove('drag-over'));
             
+            ghostElement = null;
             draggedElement = null;
-            isDragging = false;
-            document.removeEventListener('touchmove', handleTouchMove);
-            document.removeEventListener('touchend', handleTouchEnd);
             
             updateAllCounts();
             saveState();
         }
         
         function findDropZone(x, y) {
-            let targetZone = null;
-            // 先隱藏正在拖曳的元素，才能正確偵測到它下方的元素
-            if(draggedElement) draggedElement.style.pointerEvents = 'none';
-            targetZone = document.elementFromPoint(x, y);
-            if(draggedElement) draggedElement.style.pointerEvents = '';
+            ghostElement.style.display = 'none';
+            const elementBelow = document.elementFromPoint(x, y);
+            ghostElement.style.display = '';
             
-            return targetZone ? targetZone.closest('.drop-zone') : null;
+            return elementBelow ? elementBelow.closest('.drop-zone') : null;
         }
 
         function getDragAfterElement(container, x) {
@@ -622,6 +670,14 @@
             }, { offset: Number.NEGATIVE_INFINITY }).element;
         }
         
+        function getFormattedDate() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `[${year}/${month}/${day}]`;
+        }
+
         function setupEventListeners() {
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 zone.addEventListener('dragover', handleDragOver);
@@ -629,12 +685,21 @@
             
             document.getElementById('resetBtn').addEventListener('click', resetRanking);
             document.getElementById('exportBtn').addEventListener('click', exportScreenshot);
+
+            const dateInput = document.getElementById('dateInput');
+            dateInput.textContent = getFormattedDate();
+            dateInput.addEventListener('blur', function() {
+                const datePattern = /^\[\d{4}\/\d{2}\/\d{2}\]$/;
+                if (!this.textContent.match(datePattern)) {
+                    this.textContent = getFormattedDate();
+                }
+            });
         }
 
         function resetRanking() {
             if (confirm('確定要重置所有排名嗎？這會清除儲存的紀錄。')) {
                 localStorage.removeItem('vspoTierState');
-                initializeMemberState(); // 重新初始化狀態
+                initializeMemberState();
                 renderAll();
             }
         }
