@@ -501,11 +501,7 @@
         }
 
         function renderAll() {
-            const order = {};
-            document.querySelectorAll('.drop-zone').forEach(zone => {
-                order[zone.id] = [...zone.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex);
-            });
-
+            // 這個函式現在只負責根據 memberState 繪製畫面，不再記憶順序
             document.querySelectorAll('.drop-zone').forEach(zone => zone.innerHTML = '');
             
             Object.values(memberState).forEach(member => {
@@ -514,16 +510,6 @@
                  const containerId = member.tier === 'pool' ? 'memberPool' : `tier-${member.tier}`;
                  const container = document.getElementById(containerId);
                  if(container) container.appendChild(card);
-            });
-            
-            Object.keys(order).forEach(containerId => {
-                const container = document.getElementById(containerId);
-                if (container) {
-                     order[containerId].forEach(memberId => {
-                         const card = document.querySelector(`.member-card[data-member-index="${memberId}"]`);
-                         if(card) container.appendChild(card);
-                     });
-                }
             });
 
             updateAllCounts();
@@ -714,18 +700,27 @@
 
         function resetRanking() {
             if (confirm('確定要重置所有排名嗎？這會清除儲存的紀錄。')) {
+                // 1. 清除 localStorage
                 localStorage.removeItem('vspoTierState');
                 
-                // 明確地重置記憶體中的狀態
+                // 2. 重置記憶體中的狀態
                 memberState = {};
                 members.forEach((member, index) => {
                     const id = index;
                     memberState[id] = { id, tier: 'pool', isMember: false, ...member };
                 });
 
-                // 重新渲染畫面
-                renderAll();
-                saveState(); // 儲存重置後的狀態
+                // 3. 直接操作 DOM 來反映重置狀態
+                const pool = document.getElementById('memberPool');
+                document.querySelectorAll('.drop-zone').forEach(zone => zone.innerHTML = '');
+
+                Object.values(memberState).forEach(member => {
+                    pool.appendChild(createMemberCard(member.id));
+                });
+                
+                // 4. 更新計數並儲存這個乾淨的狀態
+                updateAllCounts();
+                saveState();
             }
         }
 
