@@ -613,7 +613,6 @@
                 ghostElement.style.top = `${touch.clientY - offsetY}px`;
             });
 
-            // 自動捲動邏輯
             const viewportHeight = window.innerHeight;
             const topZone = viewportHeight * 0.15;
             const bottomZone = viewportHeight * 0.85;
@@ -726,6 +725,7 @@
 
                 // 重新渲染畫面
                 renderAll();
+                saveState(); // 儲存重置後的狀態
             }
         }
 
