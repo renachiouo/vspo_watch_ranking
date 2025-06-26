@@ -716,7 +716,15 @@
         function resetRanking() {
             if (confirm('確定要重置所有排名嗎？這會清除儲存的紀錄。')) {
                 localStorage.removeItem('vspoTierState');
-                initializeMemberState();
+                
+                // 明確地重置記憶體中的狀態
+                memberState = {};
+                members.forEach((member, index) => {
+                    const id = index;
+                    memberState[id] = { id, tier: 'pool', isMember: false, ...member };
+                });
+
+                // 重新渲染畫面
                 renderAll();
             }
         }
