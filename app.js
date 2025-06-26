@@ -1,302 +1,337 @@
-:root {
-    /* 顏色變數 */
-    --color-background: rgba(252, 252, 249, 1);
-    --color-surface: rgba(255, 255, 253, 1);
-    --color-text: rgba(19, 52, 59, 1);
-    --color-text-secondary: rgba(98, 108, 113, 1);
-    --color-primary: rgba(33, 128, 141, 1);
-    --color-primary-hover: rgba(29, 116, 128, 1);
-    --color-secondary: rgba(94, 82, 64, 0.12);
-    --color-border: rgba(94, 82, 64, 0.2);
-    --color-btn-primary-text: rgba(252, 252, 249, 1);
-    --color-focus-ring: rgba(33, 128, 141, 0.4);
+// VSPO 成員資料 (頭像更新，名稱修正)
+const members = [
+    {"name_jp": "花芽すみれ", "name_en": "Kaga Sumire", "color": "#b0c4de", "avatar": "https://pbs.twimg.com/profile_images/1912465565295263744/ZXjbYmGJ_400x400.jpg"},
+    {"name_jp": "花芽なずな", "name_en": "Kaga Nazuna", "color": "#fabedc", "avatar": "https://pbs.twimg.com/profile_images/1907435057507430400/KvnnxOFy_400x400.jpg"},
+    {"name_jp": "小雀とと", "name_en": "Kogara Toto", "color": "#f5eb4a", "avatar": "https://pbs.twimg.com/profile_images/1912783899312480256/-FXzc0rz_400x400.jpg"},
+    {"name_jp": "一ノ瀬うるは", "name_en": "Ichinose Uruha", "color": "#4182fa", "avatar": "https://pbs.twimg.com/profile_images/1753117533664940032/NP-aP5RZ_400x400.jpg"},
+    {"name_jp": "胡桃のあ", "name_en": "Kurumi Noah", "color": "#ffdbfe", "avatar": "https://pbs.twimg.com/profile_images/1907727455085015045/PBwEYx6D_400x400.jpg"},
+    {"name_jp": "兎咲ミミ", "name_en": "Tosaki Mimi", "color": "#c7b2d6", "avatar": "https://pbs.twimg.com/profile_images/1879507811631300608/QT2dXtta_400x400.jpg"},
+    {"name_jp": "空澄セナ", "name_en": "Asumi Sena", "color": "#a8d8ff", "avatar": "https://pbs.twimg.com/profile_images/1907001131273961472/Z4UhnFux_400x400.jpg"},
+    {"name_jp": "橘ひなの", "name_en": "Tachibana Hinano", "color": "#fa96c8", "avatar": "https://pbs.twimg.com/profile_images/1618233947422621696/fEHyhcnK_400x400.jpg"},
+    {"name_jp": "英リサ", "name_en": "Hanabusa Lisa", "color": "#d1de79", "avatar": "https://pbs.twimg.com/profile_images/1874097043301699584/zi7RmmP3_400x400.jpg"},
+    {"name_jp": "如月れん", "name_en": "Kisaragi Ren", "color": "#be2152", "avatar": "https://pbs.twimg.com/profile_images/1847305606274932736/LBEG7ICH_400x400.jpg"},
+    {"name_jp": "神成きゅぴ", "name_en": "Kaminari Qpi", "color": "#ffd23c", "avatar": "https://pbs.twimg.com/profile_images/1862078851930828800/63fGuJI2_400x400.jpg"},
+    {"name_jp": "八雲べに", "name_en": "Yakumo Beni", "color": "#85cab3", "avatar": "https://pbs.twimg.com/profile_images/1921182407862218753/bheaA8c3_400x400.jpg"},
+    {"name_jp": "藍沢エマ", "name_en": "Aizawa Ema", "color": "#b4f1f9", "avatar": "https://pbs.twimg.com/profile_images/1881204018262974464/rn9wukHW_400x400.jpg"},
+    {"name_jp": "紫宮るな", "name_en": "Shinomiya Runa", "color": "#d6adff", "avatar": "https://pbs.twimg.com/profile_images/1839045768423817216/549FecAA_400x400.jpg"},
+    {"name_jp": "猫汰つな", "name_en": "Nekota Tsuna", "color": "#ff3652", "avatar": "https://pbs.twimg.com/profile_images/1874123390812119041/LHG2STEC_400x400.jpg"},
+    {"name_jp": "白波らむね", "name_en": "Shiranami Ramune", "color": "#8eced9", "avatar": "https://pbs.twimg.com/profile_images/1924698687097470978/OO-oOylq_400x400.jpg"},
+    {"name_jp": "小森めと", "name_en": "Komori Met", "color": "#fba03f", "avatar": "https://pbs.twimg.com/profile_images/1868231900919369728/SRXuyYfq_400x400.jpg"},
+    {"name_jp": "夢野あかり", "name_en": "Yumeno Akari", "color": "#ff998d", "avatar": "https://pbs.twimg.com/profile_images/1804138636423892995/8e6VfxvB_400x400.jpg"},
+    {"name_jp": "夜乃くろむ", "name_en": "Yano Kuromu", "color": "#909ec8", "avatar": "https://pbs.twimg.com/profile_images/1934848178534404099/duv55ZOx_400x400.jpg"},
+    {"name_jp": "紡木こかげ", "name_en": "Tsumugi Kokage", "color": "#5195e1", "avatar": "https://pbs.twimg.com/profile_images/1769316534248439808/UoI5e3Lt_400x400.jpg"},
+    {"name_jp": "千燈ゆうひ", "name_en": "Sendo Yuuhi", "color": "#ed784a", "avatar": "https://pbs.twimg.com/profile_images/1785226750089433088/mrijg6NS_400x400.jpg"},
+    {"name_jp": "蝶屋はなび", "name_en": "Choya Hanabi", "color": "#ea5506", "avatar": "https://pbs.twimg.com/profile_images/1851908795443916800/iOVHANSX_400x400.jpg"},
+    {"name_jp": "甘結もか", "name_en": "Amayui Moka", "color": "#eca0aa", "avatar": "https://pbs.twimg.com/profile_images/1851908799499767813/WO_pmLid_400x400.jpg"}
+];
 
-    /* 通用樣式 */
-    --focus-ring: 0 0 0 3px var(--color-focus-ring);
-    --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --font-size-xs: 11px;
-    --font-size-sm: 12px;
-    --font-size-base: 14px;
-    --font-size-xl: 18px;
-    --font-size-2xl: 20px;
-    --font-size-3xl: 24px;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 550;
-    --font-weight-bold: 600;
+// 應用程式狀態
+let memberState = {};
+let draggedElement = null;
 
-    /* 間距 */
-    --space-2: 2px;
-    --space-4: 4px;
-    --space-8: 8px;
-    --space-12: 12px;
-    --space-16: 16px;
-    --space-24: 24px;
-    --space-32: 32px;
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMemberState();
+    renderAll();
+    setupEventListeners();
+});
 
-    /* 圓角 */
-    --radius-sm: 6px;
-    --radius-base: 8px;
-    --radius-lg: 12px;
-    --radius-full: 9999px;
-
-    /* 陰影 */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
-    
-    /* 動畫 */
-    --duration-fast: 150ms;
-    --duration-normal: 250ms;
-    --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* 暗色模式 */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-background: rgba(31, 33, 33, 1);
-        --color-surface: rgba(38, 40, 40, 1);
-        --color-text: rgba(245, 245, 245, 1);
-        --color-text-secondary: rgba(167, 169, 169, 0.7);
-        --color-primary: rgba(50, 184, 198, 1);
-        --color-secondary: rgba(119, 124, 124, 0.15);
-        --color-border: rgba(119, 124, 124, 0.3);
-        --color-btn-primary-text: rgba(19, 52, 59, 1);
+function initializeMemberState() {
+    const savedState = localStorage.getItem('vspoTierState');
+    if (savedState) {
+        memberState = JSON.parse(savedState);
+        // 合併新成員資料，保留舊的排序和會員狀態
+        members.forEach((member, index) => {
+            if (memberState[index]) {
+                memberState[index].name_jp = member.name_jp;
+                memberState[index].name_en = member.name_en;
+                memberState[index].color = member.color;
+                memberState[index].avatar = member.avatar;
+            } else {
+                memberState[index] = { id: index, tier: 'pool', isMember: false, ...member };
+            }
+        });
+    } else {
+         members.forEach((member, index) => {
+            memberState[index] = { id: index, tier: 'pool', isMember: false, ...member };
+        });
     }
 }
 
-/* 基礎樣式 */
-html {
-    font-family: var(--font-family-base);
-    color: var(--color-text);
-    background-color: var(--color-background);
-    -webkit-font-smoothing: antialiased;
-    box-sizing: border-box;
-    touch-action: manipulation; /* 允許原生滾動，但防止干擾拖曳 */
+function saveState() {
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        const tier = zone.id === 'memberPool' ? 'pool' : zone.id.split('-')[1];
+        zone.querySelectorAll('.member-card').forEach(card => {
+            const memberIndex = card.dataset.memberIndex;
+            if(memberState[memberIndex]) {
+               memberState[memberIndex].tier = tier;
+            }
+        });
+    });
+    localStorage.setItem('vspoTierState', JSON.stringify(memberState));
 }
 
-body {
-    margin: 0;
-    padding: var(--space-16);
+function getTextColor(hexColor) {
+    if (!hexColor) return '#000000';
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 128 ? '#000000' : '#ffffff';
 }
 
-*, *::before, *::after {
-    box-sizing: inherit;
+function createMemberCard(memberIndex) {
+    const member = memberState[memberIndex];
+    const card = document.createElement('div');
+    card.className = `member-card ${member.isMember ? 'is-member' : ''}`;
+    card.draggable = true;
+    card.dataset.memberIndex = memberIndex;
+    card.style.backgroundColor = member.color;
+    card.style.color = getTextColor(member.color);
+    
+    card.innerHTML = `
+        <img src="${member.avatar}" alt="${member.name_jp} avatar" class="member-avatar" onerror="this.style.display='none'">
+        <div class="member-info">
+            <div class="member-name-jp">${member.name_jp}</div>
+            <div class="member-name-en">${member.name_en}</div>
+        </div>
+        <div class="member-checkbox-container">
+            <input type="checkbox" class="member-checkbox" id="member-${memberIndex}" ${member.isMember ? 'checked' : ''}>
+        </div>
+    `;
+    
+    card.addEventListener('dragstart', handleDragStart);
+    card.addEventListener('dragend', handleDragEnd);
+    card.addEventListener('touchstart', handleTouchStart, {passive: true});
+    
+    card.querySelector('.member-checkbox').addEventListener('change', (e) => {
+        e.stopPropagation();
+        toggleMemberStatus(memberIndex);
+    });
+    
+    return card;
 }
 
-/* 容器 */
-.container {
-    max-width: 1280px;
-    margin: auto;
-    padding: var(--space-16);
+function renderAll() {
+    const memberOrder = {};
+    // 儲存當前順序
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        const tierId = zone.id;
+        memberOrder[tierId] = [...zone.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex);
+    });
+
+    document.querySelectorAll('.drop-zone').forEach(zone => zone.innerHTML = '');
+    
+    // 按照儲存的順序或預設狀態渲染
+    Object.keys(memberState).forEach(memberIndex => {
+         const member = memberState[memberIndex];
+         if (!member) return;
+         const card = createMemberCard(memberIndex);
+         const tier = member.tier;
+         const containerId = tier === 'pool' ? 'memberPool' : `tier-${tier}`;
+         const container = document.getElementById(containerId);
+         if(container) container.appendChild(card);
+    });
+
+    // 恢復順序
+    Object.keys(memberOrder).forEach(tierId => {
+        const container = document.getElementById(tierId);
+        if (container) {
+             memberOrder[tierId].forEach(memberIndex => {
+                 const card = container.querySelector(`.member-card[data-member-index="${memberIndex}"]`);
+                 if(card) container.appendChild(card);
+             });
+        }
+    });
+
+    updateAllCounts();
 }
 
-/* 標題 */
-.app-header {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: var(--space-32);
-    text-align: center;
+function updateAllCounts() {
+    let totalInTiers = 0;
+    for (let i = 1; i <= 5; i++) {
+        const count = document.querySelectorAll(`#tier-${i} .member-card`).length;
+        totalInTiers += count;
+        const tierEl = document.querySelector(`.tier[data-tier="${i}"] .member-count`);
+        if(tierEl) tierEl.textContent = `(${count})`;
+    }
+    const poolCount = document.querySelectorAll(`#memberPool .member-card`).length;
+    const poolCountEl = document.getElementById('poolCount');
+    if(poolCountEl) poolCountEl.textContent = `(${poolCount})`;
 }
 
-.app-title {
-    font-size: var(--font-size-3xl);
-    font-weight: var(--font-weight-bold);
+function toggleMemberStatus(memberIndex) {
+    memberState[memberIndex].isMember = !memberState[memberIndex].isMember;
+    const card = document.querySelector(`.member-card[data-member-index="${memberIndex}"]`);
+    if (card) {
+        card.classList.toggle('is-member', memberState[memberIndex].isMember);
+    }
+    saveState();
 }
 
-/* 控制按鈕 */
-.controls-section {
-    display: flex;
-    justify-content: center;
-    margin-bottom: var(--space-24);
+function handleDragStart(e) {
+    draggedElement = this;
+    setTimeout(() => this.classList.add('dragging'), 0);
 }
-.controls {
-    display: flex;
-    gap: var(--space-12);
-    flex-wrap: wrap;
+function handleDragEnd() {
+    if(draggedElement) draggedElement.classList.remove('dragging');
+    draggedElement = null;
+    updateAllCounts();
+    saveState();
 }
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-8) var(--space-16);
-    border-radius: var(--radius-base);
-    font-size: var(--font-size-base);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all var(--duration-normal) var(--ease-standard);
-    border: none;
-}
-.btn--primary {
-    background: var(--color-primary);
-    color: var(--color-btn-primary-text);
-}
-.btn--secondary {
-    background: var(--color-secondary);
-    color: var(--color-text);
-}
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-/* 截圖區域 */
-#captureArea {
-    margin-bottom: var(--space-16);
+function handleDragOver(e) {
+    e.preventDefault();
+    const dropZone = e.currentTarget;
+    if (dropZone.classList.contains('drop-zone')) {
+         const afterElement = getDragAfterElement(dropZone, e.clientX);
+         if (draggedElement) {
+             if (afterElement == null) {
+                dropZone.appendChild(draggedElement);
+             } else {
+                dropZone.insertBefore(draggedElement, afterElement);
+             }
+         }
+    }
 }
 
-/* 等級分類容器 */
-.tiers-container {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-16);
+let activeTouchElement = null;
+let touchStartTimer;
+
+function handleTouchStart(e) {
+    if(e.target.classList.contains('member-checkbox')) return;
+    
+    activeTouchElement = this;
+    
+    // 長按 200ms 後啟動拖曳
+    touchStartTimer = setTimeout(() => {
+        if (!activeTouchElement) return;
+
+        draggedElement = activeTouchElement;
+        draggedElement.classList.add('dragging');
+        
+        document.addEventListener('touchmove', handleTouchMove, {passive: false});
+        document.addEventListener('touchend', handleTouchEnd, {passive: false});
+        
+        // 模擬第一次 move 事件來處理初始位置
+        handleTouchMove(e);
+
+    }, 200);
+
+    // 如果手指放開或移動，則取消長按計時
+    activeTouchElement.addEventListener('touchend', cancelLongPress, { once: true });
+    activeTouchElement.addEventListener('touchmove', cancelLongPress, { once: true });
 }
 
-.tier {
-    border-radius: var(--radius-lg);
-    padding: var(--space-16);
-    transition: all var(--duration-normal) var(--ease-standard);
-}
-.tier-1 { background-color: #8FCB8F; border-left: 6px solid #7AB37A; }
-.tier-2 { background-color: #A3D9A5; border-left: 6px solid #8FCB8F; }
-.tier-3 { background-color: #B1DFBB; border-left: 6px solid #A3D9A5; }
-.tier-4 { background-color: #C0E7C0; border-left: 6px solid #B1DFBB; }
-.tier-5 { background-color: #CDEBCC; border-left: 6px solid #C0E7C0; }
-
-.tier.drag-over {
-    transform: scale(1.01);
-    box-shadow: var(--shadow-lg);
+function cancelLongPress() {
+     clearTimeout(touchStartTimer);
 }
 
-.tier-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-12);
-}
-.tier-header h3 {
-    margin: 0;
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-semibold);
-}
-.tier-header .member-count {
-    font-size: var(--font-size-sm);
-    color: var(--color-text-secondary);
-}
-
-.tier-content, .member-pool {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-12);
-    min-height: 85px;
-    padding: var(--space-8);
-    border-radius: var(--radius-base);
-    transition: all var(--duration-fast) var(--ease-standard);
-}
-.tier-content {
-     background-color: rgba(255, 255, 255, 0.3);
-     border: 2px dashed rgba(255, 255, 255, 0.5);
-}
-.tier-content.drag-over {
-    border-color: var(--color-primary);
-    background-color: rgba(255, 255, 255, 0.5);
+function handleTouchMove(e) {
+    if (!draggedElement) return;
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const currentX = touch.clientX;
+    const currentY = touch.clientY;
+    
+    const dropZone = findDropZone(currentX, currentY);
+    
+    if(dropZone) {
+        const afterElement = getDragAfterElement(dropZone, currentX);
+         if (afterElement == null) {
+            dropZone.appendChild(draggedElement);
+         } else {
+            dropZone.insertBefore(draggedElement, afterElement);
+         }
+    }
 }
 
-/* 未分類成員區 */
-.member-pool-section {
-    margin-top: var(--space-16);
-    padding-top: var(--space-24);
-    border-top: 2px solid var(--color-border);
-}
-.member-pool-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-16);
-}
-.member-pool-header h3 { margin: 0; font-size: var(--font-size-xl); }
-.member-pool {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    min-height: 100px;
+function handleTouchEnd(e) {
+    clearTimeout(touchStartTimer);
+    if (!draggedElement) return;
+    
+    draggedElement.classList.remove('dragging');
+    
+    updateAllCounts();
+    saveState();
+
+    draggedElement = null;
+    document.removeEventListener('touchmove', handleTouchMove);
+    document.removeEventListener('touchend', handleTouchEnd);
 }
 
-/* 成員名片 */
-.member-card {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: var(--space-8);
-    width: 150px;
-    height: 55px;
-    padding: var(--space-8);
-    border-radius: var(--radius-base);
-    cursor: grab;
-    transition: all var(--duration-fast) var(--ease-standard);
-    user-select: none;
-    touch-action: none; /* 防止在卡片上滑動時頁面滾動 */
-    border: 3px solid transparent;
-    box-shadow: var(--shadow-sm);
-}
-.member-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-.member-card.dragging {
-    cursor: grabbing;
-    opacity: 0.3;
-}
-.member-card.is-member::before {
-    content: "";
-    position: absolute;
-    inset: -3px;
-    border: 3px solid;
-    border-image: linear-gradient(45deg, #FFD700, #D4AF37, #CFB53B) 1;
-    z-index: 1;
-    pointer-events: none;
-    border-radius: inherit;
+function findDropZone(x, y) {
+    let targetZone = null;
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        const rect = zone.getBoundingClientRect();
+        if (x > rect.left && x < rect.right && y > rect.top && y < rect.bottom) {
+            targetZone = zone;
+        }
+    });
+    return targetZone;
 }
 
-.member-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-full);
-    object-fit: cover;
-    flex-shrink: 0;
-    background-color: #e0e0e0;
-    pointer-events: none; /* 防止圖片干擾拖曳 */
+function getDragAfterElement(container, x) {
+    const draggableElements = [...container.querySelectorAll('.member-card:not(.dragging)')];
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = x - box.left - box.width / 2;
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
-.member-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-grow: 1;
-    overflow: hidden;
-    font-size: var(--font-size-xs);
-    pointer-events: none;
-}
-.member-name-jp {
-    font-weight: var(--font-weight-semibold);
-    white-space: nowrap;
-}
-.member-name-en {
-    opacity: 0.8;
-    white-space: nowrap;
-}
-.member-checkbox-container {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-}
-.member-checkbox {
-     width: 14px;
-     height: 14px;
-     cursor: pointer;
+function setupEventListeners() {
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.addEventListener('dragover', handleDragOver);
+    });
+    
+    document.getElementById('resetBtn').addEventListener('click', resetRanking);
+    document.getElementById('exportBtn').addEventListener('click', exportScreenshot);
 }
 
-/* 響應式設計 */
-@media (max-width: 768px) {
-    body { padding: var(--space-8); }
-    .container { padding: 0; }
-    .app-title { font-size: var(--font-size-2xl); }
-    .member-card { width: 140px; height: 50px; }
-    .tier-content, .member-pool { justify-content: center; }
+function resetRanking() {
+    if (confirm('確定要重置所有排名嗎？這會清除儲存的紀錄。')) {
+        localStorage.removeItem('vspoTierState');
+        members.forEach((member, index) => {
+            memberState[index] = { id: index, tier: 'pool', isMember: false, ...member };
+        });
+        renderAll();
+    }
+}
+
+function exportScreenshot() {
+    const btn = document.getElementById('exportBtn');
+    btn.textContent = '匯出中...';
+    btn.disabled = true;
+
+    const captureArea = document.getElementById('captureArea');
+    const tierContents = captureArea.querySelectorAll('.tier-content');
+    tierContents.forEach(tc => tc.style.border = '2px dashed transparent');
+    
+    window.scrollTo(0, 0); // 確保從頂部開始截圖
+
+    html2canvas(captureArea, {
+        backgroundColor: getComputedStyle(document.body).backgroundColor,
+        scale: 2, 
+        useCORS: true,
+        logging: false,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `VSPO排名_${new Date().toISOString().slice(0, 10)}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    }).catch(error => {
+        console.error('匯出失敗:', error);
+        alert('匯出失敗，請檢查瀏覽器主控台。');
+    }).finally(() => {
+        btn.textContent = '匯出排名截圖';
+        btn.disabled = false;
+        tierContents.forEach(tc => tc.style.border = '');
+    });
 }
