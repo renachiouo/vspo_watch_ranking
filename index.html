@@ -417,7 +417,8 @@
         let memberState = {};
         let draggedElement = null;
         let ghostElement = null;
-        let touchTimer, offsetX, offsetY;
+        let touchTimer, offsetX, offsetY, scrollInterval;
+        const scrollSpeed = 15;
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeMemberState();
@@ -446,7 +447,6 @@
         }
         
         function saveState() {
-            const newOrder = {};
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 const tier = zone.id === 'memberPool' ? 'pool' : zone.id.split('-')[1];
                 zone.querySelectorAll('.member-card').forEach(card => {
@@ -502,7 +502,6 @@
 
         function renderAll() {
             const order = {};
-             // 讀取目前的順序
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 order[zone.id] = [...zone.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex);
             });
@@ -517,7 +516,6 @@
                  if(container) container.appendChild(card);
             });
             
-            // 恢復排序
             Object.keys(order).forEach(containerId => {
                 const container = document.getElementById(containerId);
                 if (container) {
@@ -615,6 +613,20 @@
                 ghostElement.style.top = `${touch.clientY - offsetY}px`;
             });
 
+            // 自動捲動邏輯
+            const viewportHeight = window.innerHeight;
+            const topZone = viewportHeight * 0.15;
+            const bottomZone = viewportHeight * 0.85;
+
+            clearInterval(scrollInterval);
+            if (touch.clientY < topZone) {
+                scrollInterval = setInterval(() => { window.scrollBy(0, -scrollSpeed); }, 16);
+            } else if (touch.clientY > bottomZone) {
+                scrollInterval = setInterval(() => { window.scrollBy(0, scrollSpeed); }, 16);
+            } else {
+                scrollInterval = null;
+            }
+
             const dropZone = findDropZone(touch.clientX, touch.clientY);
             document.querySelectorAll('.drop-zone.drag-over').forEach(zone => zone.classList.remove('drag-over'));
             if(dropZone) dropZone.classList.add('drag-over');
@@ -622,6 +634,8 @@
 
         function handleTouchEnd(e) {
             clearTimeout(touchTimer); 
+            clearInterval(scrollInterval);
+            scrollInterval = null;
             document.removeEventListener('touchmove', handleTouchMove);
 
             if (!ghostElement) {
