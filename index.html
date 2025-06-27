@@ -339,6 +339,38 @@
             }
         }
         
+        /* 截圖彈出視窗樣式 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: none; /* 預設隱藏 */
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: var(--space-16);
+        }
+        .modal-content {
+            background-color: var(--color-surface);
+            padding: var(--space-24);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            max-width: 95vw;
+            max-height: 90vh;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-16);
+        }
+        .modal-content img {
+            max-width: 100%;
+            border-radius: var(--radius-base);
+            border: 1px solid var(--color-border);
+        }
+        
         /* 響應式設計 */
         @media (max-width: 768px) {
             body { padding: var(--space-8); }
@@ -382,6 +414,15 @@
                 <span class="member-count" id="poolCount">(0)</span>
             </div>
             <div class="member-pool drop-zone" id="memberPool"></div>
+        </div>
+    </div>
+    
+    <!-- 截圖預覽 Modal -->
+    <div id="screenshotModal" class="modal-overlay">
+        <div class="modal-content">
+            <p>請長按圖片並選擇「儲存影像」</p>
+            <img id="screenshotImage" src="" alt="VSPO排名截圖">
+            <button id="closeModalBtn" class="btn btn--primary">關閉</button>
         </div>
     </div>
 
@@ -452,17 +493,15 @@
         }
 
         function updateStateFromDOM() {
-            const newMemberState = JSON.parse(JSON.stringify(memberState));
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 const tier = zone.id === 'memberPool' ? 'pool' : zone.id.split('-')[1];
                 zone.querySelectorAll('.member-card').forEach(card => {
                     const memberId = card.dataset.memberIndex;
-                    if(newMemberState[memberId]) {
-                       newMemberState[memberId].tier = tier;
+                    if(memberState[memberId]) {
+                       memberState[memberId].tier = tier;
                     }
                 });
             });
-            memberState = newMemberState;
         }
         
         function getTextColor(hexColor) {
@@ -509,11 +548,6 @@
         }
 
         function renderAll() {
-            const order = {};
-            document.querySelectorAll('.drop-zone').forEach(zone => {
-                order[zone.id] = [...zone.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex);
-            });
-
             document.querySelectorAll('.drop-zone').forEach(zone => zone.innerHTML = '');
             
             Object.values(memberState).forEach(member => {
@@ -524,23 +558,17 @@
                  if(container) container.appendChild(card);
             });
             
-            // 只有在不是重置的情況下才恢復順序
-            if (Object.values(order).some(arr => arr.length > 0) && !isResetting) {
-                Object.keys(order).forEach(containerId => {
-                    const container = document.getElementById(containerId);
-                    if (container) {
-                         order[containerId].forEach(memberId => {
-                             const card = document.querySelector(`.member-card[data-member-index="${memberId}"]`);
-                             if(card) container.appendChild(card);
-                         });
-                    }
-                });
-            }
+            // 將未分配的成員移回 pool (防止資料錯誤)
+            const allRenderedIds = new Set([...document.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex));
+            Object.keys(memberState).forEach(id => {
+                if (!allRenderedIds.has(id)) {
+                    const pool = document.getElementById('memberPool');
+                    if (pool) pool.appendChild(createMemberCard(id));
+                }
+            });
 
             updateAllCounts();
         }
-        
-        let isResetting = false;
 
         function updateAllCounts() {
             for (let i = 1; i <= 5; i++) {
@@ -718,6 +746,9 @@
             
             document.getElementById('resetBtn').addEventListener('click', resetRanking);
             document.getElementById('exportBtn').addEventListener('click', exportScreenshot);
+            document.getElementById('closeModalBtn').addEventListener('click', () => {
+                document.getElementById('screenshotModal').style.display = 'none';
+            });
 
             const dateInput = document.getElementById('dateInput');
             dateInput.textContent = getFormattedDate();
@@ -731,12 +762,8 @@
 
         function resetRanking() {
             if (confirm('確定要重置所有排名嗎？這會清除儲存的紀錄。')) {
-                isResetting = true;
                 localStorage.removeItem('vspoTierState');
-                
-                // 重新初始化狀態
                 initializeMemberState();
-                isResetting = false;
             }
         }
 
@@ -749,35 +776,7 @@
             const tierContents = captureArea.querySelectorAll('.tier-content');
             tierContents.forEach(tc => tc.style.border = '2px dashed transparent');
             
-            const images = Array.from(captureArea.getElementsByTagName('img'));
-            const originalSrcs = images.map(img => img.src);
-
-            const promises = images.map((img, index) => {
-                if (img.src && !img.src.startsWith('data:')) {
-                    return new Promise((resolve) => {
-                        const newImg = new Image();
-                        newImg.crossOrigin = 'Anonymous';
-                        newImg.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = newImg.naturalWidth;
-                            canvas.height = newImg.naturalHeight;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(newImg, 0, 0);
-                            img.src = canvas.toDataURL('image/png');
-                            resolve();
-                        };
-                        newImg.onerror = () => resolve();
-                        newImg.src = img.src;
-                    });
-                }
-                return Promise.resolve();
-            });
-
             try {
-                await Promise.all(promises);
-
-                window.scrollTo(0, 0);
-
                 const canvas = await html2canvas(captureArea, {
                     backgroundColor: getComputedStyle(document.body).backgroundColor,
                     scale: 2, 
@@ -786,19 +785,28 @@
                     windowWidth: document.documentElement.scrollWidth,
                     windowHeight: document.documentElement.scrollHeight
                 });
-
-                const link = document.createElement('a');
-                link.download = `VSPO排名_${new Date().toISOString().slice(0, 10)}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
+                
+                const imageUrl = canvas.toDataURL('image/png');
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                
+                if(isIOS) {
+                    // 在 iOS 上顯示 Modal
+                    const modal = document.getElementById('screenshotModal');
+                    const imgEl = document.getElementById('screenshotImage');
+                    imgEl.src = imageUrl;
+                    modal.style.display = 'flex';
+                } else {
+                    // 在其他裝置上直接下載
+                    const link = document.createElement('a');
+                    link.download = `VSPO排名_${new Date().toISOString().slice(0, 10)}.png`;
+                    link.href = imageUrl;
+                    link.click();
+                }
 
             } catch(error) {
                 console.error('匯出失敗:', error);
                 alert('匯出失敗，請檢查瀏覽器主控台。');
             } finally {
-                images.forEach((img, index) => {
-                    img.src = originalSrcs[index];
-                });
                 btn.textContent = '匯出排名截圖';
                 btn.disabled = false;
                 tierContents.forEach(tc => { tc.style.border = ''; });
