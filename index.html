@@ -433,7 +433,6 @@
                     if (!memberState[id]) {
                         memberState[id] = { id, tier: 'pool', isMember: false, ...member };
                     } else {
-                        // 更新成員基本資料，但保留儲存的 tier 和 isMember 狀態
                         const oldState = {tier: memberState[id].tier, isMember: memberState[id].isMember};
                         memberState[id] = {id, ...member, ...oldState};
                     }
@@ -453,17 +452,17 @@
         }
 
         function updateStateFromDOM() {
-            const tempState = JSON.parse(JSON.stringify(memberState));
+            const newMemberState = JSON.parse(JSON.stringify(memberState));
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 const tier = zone.id === 'memberPool' ? 'pool' : zone.id.split('-')[1];
                 zone.querySelectorAll('.member-card').forEach(card => {
                     const memberId = card.dataset.memberIndex;
-                    if(tempState[memberId]) {
-                       tempState[memberId].tier = tier;
+                    if(newMemberState[memberId]) {
+                       newMemberState[memberId].tier = tier;
                     }
                 });
             });
-            memberState = tempState;
+            memberState = newMemberState;
         }
         
         function getTextColor(hexColor) {
@@ -525,15 +524,18 @@
                  if(container) container.appendChild(card);
             });
             
-            Object.keys(order).forEach(containerId => {
-                const container = document.getElementById(containerId);
-                if (container) {
-                     order[containerId].forEach(memberId => {
-                         const card = document.querySelector(`.member-card[data-member-index="${memberId}"]`);
-                         if(card) container.appendChild(card);
-                     });
-                }
-            });
+            // 只有在不是重置的情況下才恢復順序
+            if (Object.values(order).some(arr => arr.length > 0)) {
+                Object.keys(order).forEach(containerId => {
+                    const container = document.getElementById(containerId);
+                    if (container) {
+                         order[containerId].forEach(memberId => {
+                             const card = document.querySelector(`.member-card[data-member-index="${memberId}"]`);
+                             if(card) container.appendChild(card);
+                         });
+                    }
+                });
+            }
 
             updateAllCounts();
         }
@@ -730,15 +732,7 @@
                 localStorage.removeItem('vspoTierState');
                 
                 // 重新初始化狀態
-                memberState = {};
-                members.forEach((member, index) => {
-                    const id = index;
-                    memberState[id] = { id, tier: 'pool', isMember: false, ...member };
-                });
-
-                // 直接重繪畫面
-                renderAll();
-                saveState();
+                initializeMemberState();
             }
         }
 
@@ -768,7 +762,7 @@
                             img.src = canvas.toDataURL('image/png');
                             resolve();
                         };
-                        newImg.onerror = () => resolve(); // 圖片載入失敗也繼續
+                        newImg.onerror = () => resolve();
                         newImg.src = img.src;
                     });
                 }
@@ -798,7 +792,6 @@
                 console.error('匯出失敗:', error);
                 alert('匯出失敗，請檢查瀏覽器主控台。');
             } finally {
-                // 將圖片來源還原
                 images.forEach((img, index) => {
                     img.src = originalSrcs[index];
                 });
