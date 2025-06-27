@@ -548,6 +548,11 @@
         }
 
         function renderAll() {
+            const order = {};
+            document.querySelectorAll('.drop-zone').forEach(zone => {
+                order[zone.id] = [...zone.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex);
+            });
+
             document.querySelectorAll('.drop-zone').forEach(zone => zone.innerHTML = '');
             
             Object.values(memberState).forEach(member => {
@@ -558,17 +563,23 @@
                  if(container) container.appendChild(card);
             });
             
-            // 將未分配的成員移回 pool (防止資料錯誤)
-            const allRenderedIds = new Set([...document.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex));
-            Object.keys(memberState).forEach(id => {
-                if (!allRenderedIds.has(id)) {
-                    const pool = document.getElementById('memberPool');
-                    if (pool) pool.appendChild(createMemberCard(id));
-                }
-            });
+            // 只有在不是重置的情況下才恢復順序
+            if (Object.values(order).some(arr => arr.length > 0) && !isResetting) {
+                Object.keys(order).forEach(containerId => {
+                    const container = document.getElementById(containerId);
+                    if (container) {
+                         order[containerId].forEach(memberId => {
+                             const card = document.querySelector(`.member-card[data-member-index="${memberId}"]`);
+                             if(card) container.appendChild(card);
+                         });
+                    }
+                });
+            }
 
             updateAllCounts();
         }
+        
+        let isResetting = false;
 
         function updateAllCounts() {
             for (let i = 1; i <= 5; i++) {
@@ -762,8 +773,12 @@
 
         function resetRanking() {
             if (confirm('確定要重置所有排名嗎？這會清除儲存的紀錄。')) {
+                isResetting = true;
                 localStorage.removeItem('vspoTierState');
+                
+                // 重新初始化狀態
                 initializeMemberState();
+                isResetting = false;
             }
         }
 
@@ -776,7 +791,35 @@
             const tierContents = captureArea.querySelectorAll('.tier-content');
             tierContents.forEach(tc => tc.style.border = '2px dashed transparent');
             
+            const images = Array.from(captureArea.getElementsByTagName('img'));
+            const originalSrcs = images.map(img => img.src);
+
+            const promises = images.map((img, index) => {
+                if (img.src && !img.src.startsWith('data:')) {
+                    return new Promise((resolve) => {
+                        const newImg = new Image();
+                        newImg.crossOrigin = 'Anonymous';
+                        newImg.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = newImg.naturalWidth;
+                            canvas.height = newImg.naturalHeight;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(newImg, 0, 0);
+                            img.src = canvas.toDataURL('image/png');
+                            resolve();
+                        };
+                        newImg.onerror = () => resolve();
+                        newImg.src = img.src;
+                    });
+                }
+                return Promise.resolve();
+            });
+
             try {
+                await Promise.all(promises);
+
+                window.scrollTo(0, 0);
+
                 const canvas = await html2canvas(captureArea, {
                     backgroundColor: getComputedStyle(document.body).backgroundColor,
                     scale: 2, 
@@ -788,9 +831,10 @@
                 
                 const imageUrl = canvas.toDataURL('image/png');
                 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-                
-                if(isIOS) {
-                    // 在 iOS 上顯示 Modal
+                const isAndroid = /Android/.test(navigator.userAgent);
+
+                if(isIOS || isAndroid) {
+                    // 在 iOS 和 Android 上顯示 Modal
                     const modal = document.getElementById('screenshotModal');
                     const imgEl = document.getElementById('screenshotImage');
                     imgEl.src = imageUrl;
@@ -807,6 +851,9 @@
                 console.error('匯出失敗:', error);
                 alert('匯出失敗，請檢查瀏覽器主控台。');
             } finally {
+                images.forEach((img, index) => {
+                    img.src = originalSrcs[index];
+                });
                 btn.textContent = '匯出排名截圖';
                 btn.disabled = false;
                 tierContents.forEach(tc => { tc.style.border = ''; });
