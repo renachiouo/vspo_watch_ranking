@@ -731,10 +731,12 @@
 
         function resetRanking() {
             if (confirm('確定要重置所有排名嗎？這會清除儲存的紀錄。')) {
+                isResetting = true;
                 localStorage.removeItem('vspoTierState');
                 
                 // 重新初始化狀態
                 initializeMemberState();
+                isResetting = false;
             }
         }
 
