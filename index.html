@@ -386,31 +386,31 @@
     </div>
 
     <script>
-        // VSPO 成員資料，使用 x_account 來自動更新頭像
+        // VSPO 成員資料，使用 pbs.twimg.com 的靜態連結
         const members = [
-            {"name_jp": "花芽すみれ", "name_en": "Kaga Sumire", "color": "#b0c4de", "x_account": "sumire_kaga"},
-            {"name_jp": "花芽なずな", "name_en": "Kaga Nazuna", "color": "#fabedc", "x_account": "nazuna_kaga"},
-            {"name_jp": "小雀とと", "name_en": "Kogara Toto", "color": "#f5eb4a", "x_account": "toto_kogara"},
-            {"name_jp": "一ノ瀬うるは", "name_en": "Ichinose Uruha", "color": "#4182fa", "x_account": "uruha_ichinose"},
-            {"name_jp": "胡桃のあ", "name_en": "Kurumi Noah", "color": "#ffdbfe", "x_account": "n0ah_kurumi"},
-            {"name_jp": "兎咲ミミ", "name_en": "Tosaki Mimi", "color": "#c7b2d6", "x_account": "mimi_tosaki"},
-            {"name_jp": "空澄セナ", "name_en": "Asumi Sena", "color": "#ffffff", "x_account": "sena_asumi"},
-            {"name_jp": "橘ひなの", "name_en": "Tachibana Hinano", "color": "#fa96c8", "x_account": "hinano_tachiba7"},
-            {"name_jp": "英リサ", "name_en": "Hanabusa Lisa", "color": "#d1de79", "x_account": "lisa_hanabusa"},
-            {"name_jp": "如月れん", "name_en": "Kisaragi Ren", "color": "#be2152", "x_account": "ren_kisaragi__"},
-            {"name_jp": "神成きゅぴ", "name_en": "Kaminari Qpi", "color": "#ffd23c", "x_account": "KaminariQpi"},
-            {"name_jp": "八雲べに", "name_en": "Yakumo Beni", "color": "#85cab3", "x_account": "beni_yakumo"},
-            {"name_jp": "藍沢エマ", "name_en": "Aizawa Ema", "color": "#b4f1f9", "x_account": "Ema_Aizawa"},
-            {"name_jp": "紫宮るな", "name_en": "Shinomiya Runa", "color": "#d6adff", "x_account": "Runa_shinomiya"},
-            {"name_jp": "猫汰つな", "name_en": "Nekota Tsuna", "color": "#ff3652", "x_account": "tsuna_nekota"},
-            {"name_jp": "白波らむね", "name_en": "Shiranami Ramune", "color": "#8eced9", "x_account": "Ramune_Shirana3"},
-            {"name_jp": "小森めと", "name_en": "Komori Met", "color": "#fba03f", "x_account": "Met_Komori"},
-            {"name_jp": "夢野あかり", "name_en": "Yumeno Akari", "color": "#ff998d", "x_account": "AKARINdaooo"},
-            {"name_jp": "夜乃くろむ", "name_en": "Yano Kuromu", "color": "#909ec8", "x_account": "Kuromu_Yano"},
-            {"name_jp": "紡木こかげ", "name_en": "Tsumugi Kokage", "color": "#5195e1", "x_account": "kokage_tsumugi"},
-            {"name_jp": "千燈ゆうひ", "name_en": "Sendo Yuuhi", "color": "#ed784a", "x_account": "Yuuhi_Sendo"},
-            {"name_jp": "蝶屋はなび", "name_en": "Choya Hanabi", "color": "#ea5506", "x_account": "Hanabi_Choya"},
-            {"name_jp": "甘結もか", "name_en": "Amayui Moka", "color": "#eca0aa", "x_account": "Amayui_Moka"}
+            {"name_jp": "花芽すみれ", "name_en": "Kaga Sumire", "color": "#b0c4de", "avatar": "https://pbs.twimg.com/profile_images/1912465565295263744/ZXjbYmGJ_400x400.jpg"},
+            {"name_jp": "花芽なずな", "name_en": "Kaga Nazuna", "color": "#fabedc", "avatar": "https://pbs.twimg.com/profile_images/1907435057507430400/KvnnxOFy_400x400.jpg"},
+            {"name_jp": "小雀とと", "name_en": "Kogara Toto", "color": "#f5eb4a", "avatar": "https://pbs.twimg.com/profile_images/1912783899312480256/-FXzc0rz_400x400.jpg"},
+            {"name_jp": "一ノ瀬うるは", "name_en": "Ichinose Uruha", "color": "#4182fa", "avatar": "https://pbs.twimg.com/profile_images/1753117533664940032/NP-aP5RZ_400x400.jpg"},
+            {"name_jp": "胡桃のあ", "name_en": "Kurumi Noah", "color": "#ffdbfe", "avatar": "https://pbs.twimg.com/profile_images/1907727455085015045/PBwEYx6D_400x400.jpg"},
+            {"name_jp": "兎咲ミミ", "name_en": "Tosaki Mimi", "color": "#c7b2d6", "avatar": "https://pbs.twimg.com/profile_images/1879507811631300608/QT2dXtta_400x400.jpg"},
+            {"name_jp": "空澄セナ", "name_en": "Asumi Sena", "color": "#ffffff", "avatar": "https://pbs.twimg.com/profile_images/1907001131273961472/Z4UhnFux_400x400.jpg"},
+            {"name_jp": "橘ひなの", "name_en": "Tachibana Hinano", "color": "#fa96c8", "avatar": "https://pbs.twimg.com/profile_images/1618233947422621696/fEHyhcnK_400x400.jpg"},
+            {"name_jp": "英リサ", "name_en": "Hanabusa Lisa", "color": "#d1de79", "avatar": "https://pbs.twimg.com/profile_images/1874097043301699584/zi7RmmP3_400x400.jpg"},
+            {"name_jp": "如月れん", "name_en": "Kisaragi Ren", "color": "#be2152", "avatar": "https://pbs.twimg.com/profile_images/1847305606274932736/LBEG7ICH_400x400.jpg"},
+            {"name_jp": "神成きゅぴ", "name_en": "Kaminari Qpi", "color": "#ffd23c", "avatar": "https://pbs.twimg.com/profile_images/1862078851930828800/63fGuJI2_400x400.jpg"},
+            {"name_jp": "八雲べに", "name_en": "Yakumo Beni", "color": "#85cab3", "avatar": "https://pbs.twimg.com/profile_images/1921182407862218753/bheaA8c3_400x400.jpg"},
+            {"name_jp": "藍沢エマ", "name_en": "Aizawa Ema", "color": "#b4f1f9", "avatar": "https://pbs.twimg.com/profile_images/1881204018262974464/rn9wukHW_400x400.jpg"},
+            {"name_jp": "紫宮るな", "name_en": "Shinomiya Runa", "color": "#d6adff", "avatar": "https://pbs.twimg.com/profile_images/1839045768423817216/549FecAA_400x400.jpg"},
+            {"name_jp": "猫汰つな", "name_en": "Nekota Tsuna", "color": "#ff3652", "avatar": "https://pbs.twimg.com/profile_images/1874123390812119041/LHG2STEC_400x400.jpg"},
+            {"name_jp": "白波らむね", "name_en": "Shiranami Ramune", "color": "#8eced9", "avatar": "https://pbs.twimg.com/profile_images/1924698687097470978/OO-oOylq_400x400.jpg"},
+            {"name_jp": "小森めと", "name_en": "Komori Met", "color": "#fba03f", "avatar": "https://pbs.twimg.com/profile_images/1868231900919369728/SRXuyYfq_400x400.jpg"},
+            {"name_jp": "夢野あかり", "name_en": "Yumeno Akari", "color": "#ff998d", "avatar": "https://pbs.twimg.com/profile_images/1804138636423892995/8e6VfxvB_400x400.jpg"},
+            {"name_jp": "夜乃くろむ", "name_en": "Yano Kuromu", "color": "#909ec8", "avatar": "https://pbs.twimg.com/profile_images/1934848178534404099/duv55ZOx_400x400.jpg"},
+            {"name_jp": "紡木こかげ", "name_en": "Tsumugi Kokage", "color": "#5195e1", "avatar": "https://pbs.twimg.com/profile_images/1769316534248439808/UoI5e3Lt_400x400.jpg"},
+            {"name_jp": "千燈ゆうひ", "name_en": "Sendo Yuuhi", "color": "#ed784a", "avatar": "https://pbs.twimg.com/profile_images/1785226750089433088/mrijg6NS_400x400.jpg"},
+            {"name_jp": "蝶屋はなび", "name_en": "Choya Hanabi", "color": "#ea5506", "avatar": "https://pbs.twimg.com/profile_images/1851908795443916800/iOVHANSX_400x400.jpg"},
+            {"name_jp": "甘結もか", "name_en": "Amayui Moka", "color": "#eca0aa", "avatar": "https://pbs.twimg.com/profile_images/1851908799499767813/WO_pmLid_400x400.jpg"}
         ];
 
         // 應用程式狀態
@@ -422,8 +422,6 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeMemberState();
-            renderAll();
-            setupEventListeners();
         });
         
         function initializeMemberState() {
@@ -432,10 +430,12 @@
                 memberState = JSON.parse(savedState);
                 members.forEach((member, index) => {
                     const id = index;
-                    if (memberState[id]) {
-                        Object.assign(memberState[id], member);
-                    } else {
+                    if (!memberState[id]) {
                         memberState[id] = { id, tier: 'pool', isMember: false, ...member };
+                    } else {
+                        // 更新成員基本資料，但保留儲存的 tier 和 isMember 狀態
+                        const oldState = {tier: memberState[id].tier, isMember: memberState[id].isMember};
+                        memberState[id] = {id, ...member, ...oldState};
                     }
                 });
             } else {
@@ -444,19 +444,26 @@
                     memberState[id] = { id, tier: 'pool', isMember: false, ...member };
                 });
             }
+            renderAll();
+            setupEventListeners();
         }
         
         function saveState() {
+            localStorage.setItem('vspoTierState', JSON.stringify(memberState));
+        }
+
+        function updateStateFromDOM() {
+            const tempState = JSON.parse(JSON.stringify(memberState));
             document.querySelectorAll('.drop-zone').forEach(zone => {
                 const tier = zone.id === 'memberPool' ? 'pool' : zone.id.split('-')[1];
                 zone.querySelectorAll('.member-card').forEach(card => {
                     const memberId = card.dataset.memberIndex;
-                    if(memberState[memberId]) {
-                       memberState[memberId].tier = tier;
+                    if(tempState[memberId]) {
+                       tempState[memberId].tier = tier;
                     }
                 });
             });
-            localStorage.setItem('vspoTierState', JSON.stringify(memberState));
+            memberState = tempState;
         }
         
         function getTextColor(hexColor) {
@@ -479,11 +486,11 @@
             card.style.backgroundColor = member.color;
             card.style.color = getTextColor(member.color);
             
-            const avatarUrl = `https://unavatar.io/twitter/${member.x_account}`;
+            const avatarUrl = member.avatar;
 
             card.innerHTML = `
                 <span class="member-star"></span>
-                <img src="${avatarUrl}" alt="${member.name_jp} avatar" class="member-avatar" onerror="this.src='https://placehold.co/40x40/eeeeee/333333?text=?'; this.onerror=null;">
+                <img src="${avatarUrl}" alt="${member.name_jp} avatar" class="member-avatar" crossorigin="anonymous" onerror="this.src='https://placehold.co/40x40/eeeeee/333333?text=?'; this.onerror=null;">
                 <div class="member-info">
                     <div class="member-name-jp">${member.name_jp}</div>
                     <div class="member-name-en">${member.name_en}</div>
@@ -554,10 +561,13 @@
             setTimeout(() => this.classList.add('dragging'), 0);
         }
         function handleDragEnd() {
-            if(draggedElement) draggedElement.classList.remove('dragging');
+            if(draggedElement) {
+                draggedElement.classList.remove('dragging');
+                updateStateFromDOM();
+                saveState();
+            }
             draggedElement = null;
             updateAllCounts();
-            saveState();
         }
         function handleDragOver(e) {
             e.preventDefault();
@@ -663,6 +673,7 @@
             ghostElement = null;
             draggedElement = null;
             
+            updateStateFromDOM();
             updateAllCounts();
             saveState();
         }
@@ -718,13 +729,20 @@
             if (confirm('確定要重置所有排名嗎？這會清除儲存的紀錄。')) {
                 localStorage.removeItem('vspoTierState');
                 
-                initializeMemberState();
+                // 重新初始化狀態
+                memberState = {};
+                members.forEach((member, index) => {
+                    const id = index;
+                    memberState[id] = { id, tier: 'pool', isMember: false, ...member };
+                });
+
+                // 直接重繪畫面
                 renderAll();
                 saveState();
             }
         }
 
-        function exportScreenshot() {
+        async function exportScreenshot() {
             const btn = document.getElementById('exportBtn');
             btn.textContent = '匯出中...';
             btn.disabled = true;
@@ -733,28 +751,61 @@
             const tierContents = captureArea.querySelectorAll('.tier-content');
             tierContents.forEach(tc => tc.style.border = '2px dashed transparent');
             
-            window.scrollTo(0, 0);
+            const images = Array.from(captureArea.getElementsByTagName('img'));
+            const originalSrcs = images.map(img => img.src);
 
-            html2canvas(captureArea, {
-                backgroundColor: getComputedStyle(document.body).backgroundColor,
-                scale: 2, 
-                useCORS: true,
-                logging: false,
-                windowWidth: document.documentElement.scrollWidth,
-                windowHeight: document.documentElement.scrollHeight
-            }).then(canvas => {
+            const promises = images.map((img, index) => {
+                if (img.src && !img.src.startsWith('data:')) {
+                    return new Promise((resolve) => {
+                        const newImg = new Image();
+                        newImg.crossOrigin = 'Anonymous';
+                        newImg.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = newImg.naturalWidth;
+                            canvas.height = newImg.naturalHeight;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(newImg, 0, 0);
+                            img.src = canvas.toDataURL('image/png');
+                            resolve();
+                        };
+                        newImg.onerror = () => resolve(); // 圖片載入失敗也繼續
+                        newImg.src = img.src;
+                    });
+                }
+                return Promise.resolve();
+            });
+
+            try {
+                await Promise.all(promises);
+
+                window.scrollTo(0, 0);
+
+                const canvas = await html2canvas(captureArea, {
+                    backgroundColor: getComputedStyle(document.body).backgroundColor,
+                    scale: 2, 
+                    useCORS: true,
+                    logging: false,
+                    windowWidth: document.documentElement.scrollWidth,
+                    windowHeight: document.documentElement.scrollHeight
+                });
+
                 const link = document.createElement('a');
                 link.download = `VSPO排名_${new Date().toISOString().slice(0, 10)}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
-            }).catch(error => {
+
+            } catch(error) {
                 console.error('匯出失敗:', error);
                 alert('匯出失敗，請檢查瀏覽器主控台。');
-            }).finally(() => {
+            } finally {
+                // 將圖片來源還原
+                images.forEach((img, index) => {
+                    img.src = originalSrcs[index];
+                });
                 btn.textContent = '匯出排名截圖';
                 btn.disabled = false;
-                tierContents.forEach(tc => tc.style.border = '');
-            });
+                tierContents.forEach(tc => { tc.style.border = ''; });
+            }
         }
     </script>
 </body>
