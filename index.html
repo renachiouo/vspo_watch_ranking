@@ -420,30 +420,47 @@
         let touchTimer, offsetX, offsetY, scrollInterval;
         const scrollSpeed = 15;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeMemberState();
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initializeMemberState();
             renderAll();
             setupEventListeners();
         });
         
-        function initializeMemberState() {
+        async function initializeMemberState() {
             const savedState = localStorage.getItem('vspoTierState');
             if (savedState) {
                 memberState = JSON.parse(savedState);
-                members.forEach((member, index) => {
-                    const id = index;
-                    if (memberState[id]) {
-                        Object.assign(memberState[id], member);
-                    } else {
-                        memberState[id] = { id, tier: 'pool', isMember: false, ...member };
-                    }
-                });
-            } else {
-                 members.forEach((member, index) => {
-                    const id = index;
-                    memberState[id] = { id, tier: 'pool', isMember: false, ...member };
-                });
             }
+                
+            const promises = members.map(async (member, index) => {
+                const id = index;
+                // 合併或建立狀態
+                if (!memberState[id]) {
+                    memberState[id] = { id, tier: 'pool', isMember: false };
+                }
+                Object.assign(memberState[id], member);
+                
+                // 檢查是否已有快取的頭像資料
+                if (!memberState[id].avatarDataUrl) {
+                    try {
+                        const url = `https://unavatar.io/twitter/${member.x_account}`;
+                        const response = await fetch(url);
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        const blob = await response.blob();
+                        memberState[id].avatarDataUrl = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.onerror = reject;
+                            reader.readAsDataURL(blob);
+                        });
+                    } catch (error) {
+                        console.error(`Failed to fetch avatar for ${member.name_jp}:`, error);
+                        memberState[id].avatarDataUrl = null; // 標記為失敗
+                    }
+                }
+            });
+            await Promise.all(promises);
+            saveState(); // 儲存包含頭像資料的狀態
         }
         
         function saveState() {
@@ -465,297 +482,4 @@
             if(hex.length < 6) return '#000000';
             const r = parseInt(hex.substr(0, 2), 16);
             const g = parseInt(hex.substr(2, 2), 16);
-            const b = parseInt(hex.substr(4, 2), 16);
-            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-            return brightness > 128 ? '#000000' : '#ffffff';
-        }
-        
-        function createMemberCard(memberIndex) {
-            const member = memberState[memberIndex];
-            const card = document.createElement('div');
-            card.className = `member-card ${member.isMember ? 'is-member' : ''}`;
-            card.draggable = true;
-            card.dataset.memberIndex = memberIndex;
-            card.style.backgroundColor = member.color;
-            card.style.color = getTextColor(member.color);
-            
-            const avatarUrl = `https://unavatar.io/twitter/${member.x_account}`;
-
-            card.innerHTML = `
-                <span class="member-star"></span>
-                <img src="${avatarUrl}" alt="${member.name_jp} avatar" class="member-avatar" onerror="this.src='https://placehold.co/40x40/eeeeee/333333?text=?'; this.onerror=null;">
-                <div class="member-info">
-                    <div class="member-name-jp">${member.name_jp}</div>
-                    <div class="member-name-en">${member.name_en}</div>
-                </div>
-            `;
-            
-            card.addEventListener('dragstart', handleDragStart);
-            card.addEventListener('dragend', handleDragEnd);
-            card.addEventListener('touchstart', handleTouchStart, {passive: false});
-            
-            card.querySelector('.member-star').addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleMemberStatus(memberIndex);
-            });
-            
-            return card;
-        }
-
-        function renderAll() {
-            const order = {};
-            document.querySelectorAll('.drop-zone').forEach(zone => {
-                order[zone.id] = [...zone.querySelectorAll('.member-card')].map(c => c.dataset.memberIndex);
-            });
-
-            document.querySelectorAll('.drop-zone').forEach(zone => zone.innerHTML = '');
-            
-            Object.values(memberState).forEach(member => {
-                 if (!member) return;
-                 const card = createMemberCard(member.id);
-                 const containerId = member.tier === 'pool' ? 'memberPool' : `tier-${member.tier}`;
-                 const container = document.getElementById(containerId);
-                 if(container) container.appendChild(card);
-            });
-            
-            Object.keys(order).forEach(containerId => {
-                const container = document.getElementById(containerId);
-                if (container) {
-                     order[containerId].forEach(memberId => {
-                         const card = document.querySelector(`.member-card[data-member-index="${memberId}"]`);
-                         if(card) container.appendChild(card);
-                     });
-                }
-            });
-
-            updateAllCounts();
-        }
-
-        function updateAllCounts() {
-            for (let i = 1; i <= 5; i++) {
-                const count = document.querySelectorAll(`#tier-${i} .member-card`).length;
-                const tierEl = document.querySelector(`.tier[data-tier="${i}"] .member-count`);
-                if(tierEl) tierEl.textContent = `(${count})`;
-            }
-            const poolCount = document.querySelectorAll(`#memberPool .member-card`).length;
-            const poolCountEl = document.getElementById('poolCount');
-            if(poolCountEl) poolCountEl.textContent = `(${poolCount})`;
-        }
-        
-        function toggleMemberStatus(memberIndex) {
-            memberState[memberIndex].isMember = !memberState[memberIndex].isMember;
-            document.querySelector(`.member-card[data-member-index="${memberIndex}"]`)
-                  .classList.toggle('is-member', memberState[memberIndex].isMember);
-            saveState();
-        }
-
-        function handleDragStart(e) {
-            draggedElement = this;
-            setTimeout(() => this.classList.add('dragging'), 0);
-        }
-        function handleDragEnd() {
-            if(draggedElement) draggedElement.classList.remove('dragging');
-            draggedElement = null;
-            updateAllCounts();
-            saveState();
-        }
-        function handleDragOver(e) {
-            e.preventDefault();
-            const dropZone = e.currentTarget;
-            if (dropZone.classList.contains('drop-zone')) {
-                 const afterElement = getDragAfterElement(dropZone, e.clientX);
-                 if (draggedElement) {
-                     if (afterElement == null) {
-                        dropZone.appendChild(draggedElement);
-                     } else {
-                        dropZone.insertBefore(draggedElement, afterElement);
-                     }
-                 }
-            }
-        }
-        
-        function handleTouchStart(e) {
-            if (e.target.classList.contains('member-star')) return;
-            draggedElement = this;
-
-            touchTimer = setTimeout(() => {
-                e.preventDefault();
-                
-                const touch = e.touches[0];
-                const rect = draggedElement.getBoundingClientRect();
-                
-                offsetX = touch.clientX - rect.left;
-                offsetY = touch.clientY - rect.top;
-
-                ghostElement = draggedElement.cloneNode(true);
-                ghostElement.classList.add('ghost');
-                document.body.appendChild(ghostElement);
-                ghostElement.style.width = `${rect.width}px`;
-                ghostElement.style.height = `${rect.height}px`;
-
-                ghostElement.style.left = `${touch.clientX - offsetX}px`;
-                ghostElement.style.top = `${touch.clientY - offsetY}px`;
-                
-                draggedElement.classList.add('dragging');
-
-                document.addEventListener('touchmove', handleTouchMove, {passive: false});
-            }, 150);
-
-            document.addEventListener('touchend', handleTouchEnd, {once: true});
-        }
-        
-        function handleTouchMove(e) {
-            if (!ghostElement) return;
-            e.preventDefault();
-
-            const touch = e.touches[0];
-            
-            requestAnimationFrame(() => {
-                ghostElement.style.left = `${touch.clientX - offsetX}px`;
-                ghostElement.style.top = `${touch.clientY - offsetY}px`;
-            });
-
-            const viewportHeight = window.innerHeight;
-            const topZone = viewportHeight * 0.15;
-            const bottomZone = viewportHeight * 0.85;
-
-            clearInterval(scrollInterval);
-            if (touch.clientY < topZone) {
-                scrollInterval = setInterval(() => { window.scrollBy(0, -scrollSpeed); }, 16);
-            } else if (touch.clientY > bottomZone) {
-                scrollInterval = setInterval(() => { window.scrollBy(0, scrollSpeed); }, 16);
-            } else {
-                scrollInterval = null;
-            }
-
-            const dropZone = findDropZone(touch.clientX, touch.clientY);
-            document.querySelectorAll('.drop-zone.drag-over').forEach(zone => zone.classList.remove('drag-over'));
-            if(dropZone) dropZone.classList.add('drag-over');
-        }
-
-        function handleTouchEnd(e) {
-            clearTimeout(touchTimer); 
-            clearInterval(scrollInterval);
-            scrollInterval = null;
-            document.removeEventListener('touchmove', handleTouchMove);
-
-            if (!ghostElement) {
-                draggedElement = null;
-                return;
-            }
-
-            const touch = e.changedTouches[0];
-            const dropZone = findDropZone(touch.clientX, touch.clientY);
-            
-            if (dropZone) {
-                const afterElement = getDragAfterElement(dropZone, touch.clientX);
-                if (afterElement == null) {
-                    dropZone.appendChild(draggedElement);
-                } else {
-                    dropZone.insertBefore(draggedElement, afterElement);
-                }
-            }
-            
-            document.body.removeChild(ghostElement);
-            draggedElement.classList.remove('dragging');
-            document.querySelectorAll('.drop-zone.drag-over').forEach(zone => zone.classList.remove('drag-over'));
-            
-            ghostElement = null;
-            draggedElement = null;
-            
-            updateAllCounts();
-            saveState();
-        }
-        
-        function findDropZone(x, y) {
-            ghostElement.style.display = 'none';
-            const elementBelow = document.elementFromPoint(x, y);
-            ghostElement.style.display = '';
-            
-            return elementBelow ? elementBelow.closest('.drop-zone') : null;
-        }
-
-        function getDragAfterElement(container, x) {
-            const draggableElements = [...container.querySelectorAll('.member-card:not(.dragging)')];
-            return draggableElements.reduce((closest, child) => {
-                const box = child.getBoundingClientRect();
-                const offset = x - box.left - box.width / 2;
-                if (offset < 0 && offset > closest.offset) {
-                    return { offset: offset, element: child };
-                } else {
-                    return closest;
-                }
-            }, { offset: Number.NEGATIVE_INFINITY }).element;
-        }
-        
-        function getFormattedDate() {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            return `[${year}/${month}/${day}]`;
-        }
-
-        function setupEventListeners() {
-            document.querySelectorAll('.drop-zone').forEach(zone => {
-                zone.addEventListener('dragover', handleDragOver);
-            });
-            
-            document.getElementById('resetBtn').addEventListener('click', resetRanking);
-            document.getElementById('exportBtn').addEventListener('click', exportScreenshot);
-
-            const dateInput = document.getElementById('dateInput');
-            dateInput.textContent = getFormattedDate();
-            dateInput.addEventListener('blur', function() {
-                const datePattern = /^\[\d{4}\/\d{2}\/\d{2}\]$/;
-                if (!this.textContent.match(datePattern)) {
-                    this.textContent = getFormattedDate();
-                }
-            });
-        }
-
-        function resetRanking() {
-            if (confirm('確定要重置所有排名嗎？這會清除儲存的紀錄。')) {
-                localStorage.removeItem('vspoTierState');
-                
-                initializeMemberState();
-                renderAll();
-                saveState();
-            }
-        }
-
-        function exportScreenshot() {
-            const btn = document.getElementById('exportBtn');
-            btn.textContent = '匯出中...';
-            btn.disabled = true;
-
-            const captureArea = document.getElementById('captureArea');
-            const tierContents = captureArea.querySelectorAll('.tier-content');
-            tierContents.forEach(tc => tc.style.border = '2px dashed transparent');
-            
-            window.scrollTo(0, 0);
-
-            html2canvas(captureArea, {
-                backgroundColor: getComputedStyle(document.body).backgroundColor,
-                scale: 2, 
-                useCORS: true,
-                logging: false,
-                windowWidth: document.documentElement.scrollWidth,
-                windowHeight: document.documentElement.scrollHeight
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `VSPO排名_${new Date().toISOString().slice(0, 10)}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
-            }).catch(error => {
-                console.error('匯出失敗:', error);
-                alert('匯出失敗，請檢查瀏覽器主控台。');
-            }).finally(() => {
-                btn.textContent = '匯出排名截圖';
-                btn.disabled = false;
-                tierContents.forEach(tc => tc.style.border = '');
-            });
-        }
-    </script>
-</body>
-</html>
+            const b = parseInt(hex.substr
