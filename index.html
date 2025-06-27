@@ -525,7 +525,7 @@
             });
             
             // 只有在不是重置的情況下才恢復順序
-            if (Object.values(order).some(arr => arr.length > 0)) {
+            if (Object.values(order).some(arr => arr.length > 0) && !isResetting) {
                 Object.keys(order).forEach(containerId => {
                     const container = document.getElementById(containerId);
                     if (container) {
@@ -539,6 +539,8 @@
 
             updateAllCounts();
         }
+        
+        let isResetting = false;
 
         function updateAllCounts() {
             for (let i = 1; i <= 5; i++) {
